@@ -6,6 +6,7 @@ Param(
     , $RollingSupportMass
     , [Switch]$SupportPropHiggs=$false
     , $DeviationMinimum = 0
+    , [Switch]$NoConsoleOutput=$false
 )
 
 Begin {
@@ -177,7 +178,9 @@ Process {
         $DeviationMinimum..$DeviationHigh | ForEach-Object {
             $Deviation = $_
             $Heading = ($HeadingFormat -f $CurrentWormholeMass, $Deviation, $RollingBattleshipMass, $RollingSupportMass)
-            Write-Host $Heading
+            if(-not $NoConsoleOutput) {
+                Write-Host $Heading
+            }
             $Heading | Out-File -FilePath $DetailsFile -Append
 
             $Status = Roll-Wormhole `
@@ -203,9 +206,11 @@ Process {
             if($Status.Success -ne 'Yes') {
                 $Result | Out-File -FilePath $FailuresFile -Append
                 $Status.Plan | Out-File -FilePath $FailuresFile -Append
-                Write-Host $Result
-                Write-Host "Here's how it happened:"
-                Write-Host $Status.Nutshell
+                if(-not $NoConsoleOutput) {
+                    Write-Host $Result
+                    Write-Host "Here's how it happened:"
+                    Write-Host $Status.Nutshell
+                }
             }
         }
     }
